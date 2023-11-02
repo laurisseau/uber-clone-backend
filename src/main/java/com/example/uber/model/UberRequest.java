@@ -39,9 +39,14 @@ public class UberRequest {
 
     private String distance;
 
-    private int cost;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "amount")),
+            @AttributeOverride(name = "client_secret", column = @Column(name = "client_secret")),
+            @AttributeOverride(name = "paid", column = @Column(name = "paid"))
 
-    private boolean paid;
+    })
+    private Payment payment;
 
     public UberRequest(){
 

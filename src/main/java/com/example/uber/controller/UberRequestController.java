@@ -1,5 +1,6 @@
 package com.example.uber.controller;
 
+import com.example.uber.model.Payment;
 import com.example.uber.model.UberRequest;
 import com.example.uber.repository.UberRequestRepository;
 import com.example.uber.service.UberRequestService;
@@ -29,6 +30,26 @@ public class UberRequestController {
     @GetMapping("/uberRequest/{uberRequestId}")
     public Optional<UberRequest> getUberRequest(@PathVariable int uberRequestId) {
         return uberRequestRepository.findById(uberRequestId);
+    }
+
+    @PutMapping("/updateUberRequestClientSecret/{uberRequestId}")
+    public Optional<UberRequest> updateUberRequestClientSecret(@PathVariable int uberRequestId, @RequestBody UberRequest updatedUberRequest ) {
+        return uberRequestRepository.findById(uberRequestId)
+                .map(uberRequest -> {
+                    Payment updatedPayment = updatedUberRequest.getPayment();
+                    uberRequest.getPayment().setClientSecret(updatedPayment.getClientSecret());
+                    return uberRequestRepository.save(uberRequest);
+                });
+    }
+
+    @PutMapping("/updateUberRequestPaid/{uberRequestId}")
+    public Optional<UberRequest> updateUberRequestPaid(@PathVariable int uberRequestId, @RequestBody UberRequest updatedUberRequest ) {
+        return uberRequestRepository.findById(uberRequestId)
+                .map(uberRequest -> {
+                    Payment updatedPayment = updatedUberRequest.getPayment();
+                    uberRequest.getPayment().setPaid(updatedPayment.isPaid());
+                    return uberRequestRepository.save(uberRequest);
+                });
     }
 
 

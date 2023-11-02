@@ -1,11 +1,13 @@
 package com.example.uber.security;
 
-import com.example.uber.service.AuthenticationService;
+import com.example.uber.service.DriverAuthenticationService;
+import com.example.uber.service.UserAuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Arrays;
+import java.util.List;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -26,7 +29,8 @@ import java.util.Arrays;
 public class SecurityFilter {
 
     private final JwtAuthFilter jwtAuthFilter;
-    private final AuthenticationService authenticationService;
+    private final UserAuthenticationService userAuthenticationService;
+    private final DriverAuthenticationService driverAuthenticationService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
@@ -77,11 +81,12 @@ public class SecurityFilter {
                             .requestMatchers("/api/permitAll/**").permitAll()
                             .requestMatchers("/api/auth/**").permitAll()
                             .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
-                            .requestMatchers("/api/user/**").hasAuthority("USER")
+                            .requestMatchers("/api/user/**", "/api/payment/**").hasAuthority("USER")
                             .anyRequest().authenticated()
                     )
                     .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                    .authenticationProvider(authenticationProvider())
+                    //.authenticationProvider(authenticationProvider())
+                    .authenticationManager(authenticationManager())
                     .addFilterBefore(jwtAuthFilter,
                             UsernamePasswordAuthenticationFilter.class)
                     .exceptionHandling((exception) -> exception.accessDeniedHandler(customAccessDeniedHandler));
@@ -103,24 +108,24 @@ public class SecurityFilter {
      * - The configured AuthenticationProvider is returned as a Spring Bean for authentication use.
      */
     @Bean
-    public AuthenticationProvider authenticationProvider(){
+    public AuthenticationProvider userAuthenticationProvider(){
         final DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(authenticationService);
+        authenticationProvider.setUserDetailsService(userAuthenticationService);
         authenticationProvider.setPasswordEncoder(bCryptPasswordEncoder);
         return authenticationProvider;
     }
 
-    /**
-     * This code defines a Spring Bean for configuring and providing an AuthenticationManager.
-     * - AuthenticationManager manages authentication operations in a Spring Security-enabled application.
-     * - It takes an `AuthenticationConfiguration` object for configuration.
-     * - The method retrieves a pre-configured AuthenticationManager from the `config` object.
-     * - It may throw exceptions for configuration issues.
-     * - The configured AuthenticationManager is returned as a Spring Bean for use throughout the application.
-     */
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+    public AuthenticationProvider driverAuthenticationProvider(){
+        final DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(driverAuthenticationService);
+        authenticationProvider.setPasswordEncoder(bCryptPasswordEncoder);
+        return authenticationProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager() throws Exception {
+        return new ProviderManager(List.of(driverAuthenticationProvider(), userAuthenticationProvider()));
     }
 
 }

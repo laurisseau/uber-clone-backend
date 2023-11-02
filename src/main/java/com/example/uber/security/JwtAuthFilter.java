@@ -1,6 +1,6 @@
 package com.example.uber.security;
 
-import com.example.uber.service.AuthenticationService;
+import com.example.uber.service.UserAuthenticationService;
 import com.example.uber.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,7 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final AuthenticationService authenticationService;
+    private final UserAuthenticationService userAuthenticationService;
     private final JwtUtils jwtUtils;
 
     @Override
@@ -46,11 +46,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         jwtToken = authHeader.substring(7);
-
+        System.out.println("before username");
         username = jwtUtils.extractUsername(jwtToken);
 
         if(SecurityContextHolder.getContext().getAuthentication() == null){
-            UserDetails userDetails = authenticationService.loadUserByUsername(username);
+            System.out.println("before userdetails");
+            UserDetails userDetails = userAuthenticationService.loadUserByUsername(username);
+            System.out.println(userDetails);
             if(jwtUtils.isTokenValid(jwtToken, userDetails)){
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userDetails,

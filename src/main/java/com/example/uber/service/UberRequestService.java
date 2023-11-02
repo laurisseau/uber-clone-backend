@@ -1,6 +1,7 @@
 package com.example.uber.service;
 
 import com.example.uber.config.Config;
+import com.example.uber.model.Payment;
 import com.example.uber.model.UberRequest;
 import com.example.uber.repository.UberRequestRepository;
 import com.example.uber.utils.UberUtils;
@@ -46,17 +47,20 @@ public class UberRequestService {
             String duration = uberRequest.getDuration();
             String distance = uberRequest.getDistance();
 
-            int cost = (int) ((uberUtils.convertToMinutes(duration) * .25 + uberUtils.extractMiles(distance)) * 100);
+            Long amount = (long) ((uberUtils.convertToMinutes(duration) * .25 + uberUtils.extractMiles(distance)) * 100);
 
-            uberRequest.setCost(cost);
-            uberRequest.setPaid(false);
+            Payment payment = new Payment();
+            payment.setAmount(amount);
+            payment.setPaid(false);
+
+            uberRequest.setPayment(payment);
 
             uberRequestRepository.save(uberRequest);
 
             return ResponseEntity.ok(uberRequest);
 
         }catch(Exception e){
-
+            System.out.println(e);
             return ResponseEntity.badRequest().body(uberRequest);
 
         }

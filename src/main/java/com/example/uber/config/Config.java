@@ -20,6 +20,9 @@ public class Config {
     @Value("${smartyStreets.authToken}")
     private String smartyStreetsAuthToken;
 
+    @Value("${stripe.secret.apiKey}")
+    private String stripeSecretApiKey;
+
     @Bean
     public String getJwtSecret() {return jwtSecret;}
 
@@ -30,5 +33,8 @@ public class Config {
     public String getSmartyStreetsAuthId() {return smartyStreetsAuthId;}
     @Bean
     public String getSmartyStreetsAuthToken() {return smartyStreetsAuthToken;}
+
+    @Bean
+    public String getStripeSecretApiKey() {return stripeSecretApiKey;}
 
 }
