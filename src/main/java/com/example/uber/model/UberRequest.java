@@ -26,6 +26,8 @@ public class UberRequest {
     })
     private Coordinates origin;
 
+    private String originAddress;
+
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "lat", column = @Column(name = "destination_latitude")),
@@ -33,11 +35,19 @@ public class UberRequest {
     })
     private Coordinates destination;
 
+    private String destinationAddress;
+
     private String number;
 
     private String duration;
 
     private String distance;
+
+    private boolean accepted;
+
+    private boolean driverArrived;
+
+    private boolean dropOffCompleted;
 
     @Embedded
     @AttributeOverrides({
@@ -47,6 +57,11 @@ public class UberRequest {
 
     })
     private Payment payment;
+
+    // many UberRequests can have the same driver
+    @JoinColumn(name = "driver_id")
+    @ManyToOne
+    private Drivers driver;
 
     public UberRequest(){
 

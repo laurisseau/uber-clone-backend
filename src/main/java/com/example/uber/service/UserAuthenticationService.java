@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.example.uber.model.UserRole.USER;
 
@@ -30,6 +31,18 @@ public class UserAuthenticationService implements UserDetailsService {
 
         return userAuthenticationRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    public Boolean jwtAuthCheck(String username) {
+        try {
+            Users user = userAuthenticationRepository.findByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+            return user.isEnabled();
+
+        } catch (UsernameNotFoundException e) {
+            return false;
+        }
     }
 
     public Map<String, Object> userInfo(String username, String token) throws UsernameNotFoundException {

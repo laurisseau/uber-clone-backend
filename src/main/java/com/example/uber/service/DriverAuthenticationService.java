@@ -71,7 +71,7 @@ public class DriverAuthenticationService implements UserDetailsService {
         }
 
         driver.setPassword(bCryptPasswordEncoder.encode(driver.getPassword()));
-        driver.setUserRole(UserRole.DRIVER);
+        driver.setUserRole(UserRole.USER);
 
         driverAuthenticationRepository.save(driver);
 

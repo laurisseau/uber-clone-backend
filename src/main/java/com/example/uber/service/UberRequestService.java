@@ -1,8 +1,11 @@
 package com.example.uber.service;
 
 import com.example.uber.config.Config;
+import com.example.uber.model.Drivers;
 import com.example.uber.model.Payment;
 import com.example.uber.model.UberRequest;
+import com.example.uber.model.UserRole;
+import com.example.uber.repository.DriverAuthenticationRepository;
 import com.example.uber.repository.UberRequestRepository;
 import com.example.uber.utils.UberUtils;
 import lombok.AllArgsConstructor;
@@ -19,6 +22,7 @@ public class UberRequestService {
     private final Config config;
     private final UberUtils uberUtils;
     private final UberRequestRepository uberRequestRepository;
+    private final DriverAuthenticationRepository driverAuthenticationRepository;
 
     public String getDirections(String origin, String destination) {
 
@@ -52,6 +56,9 @@ public class UberRequestService {
             Payment payment = new Payment();
             payment.setAmount(amount);
             payment.setPaid(false);
+
+            uberRequest.setDriver(null);
+
 
             uberRequest.setPayment(payment);
 

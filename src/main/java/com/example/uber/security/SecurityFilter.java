@@ -78,9 +78,11 @@ public class SecurityFilter {
                     })
                     .csrf(AbstractHttpConfigurer::disable)
                     .authorizeHttpRequests((req) -> req
-                            .requestMatchers("/api/permitAll/**").permitAll()
-                            .requestMatchers("/api/auth/**").permitAll()
+                            .requestMatchers("/api/permitAll/**", "/api/auth/**").permitAll()
+                            //.requestMatchers("/api/auth/**").permitAll()
+
                             .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+                            .requestMatchers("/api/driver/**").hasAuthority("DRIVER")
                             .requestMatchers("/api/user/**", "/api/payment/**").hasAuthority("USER")
                             .anyRequest().authenticated()
                     )

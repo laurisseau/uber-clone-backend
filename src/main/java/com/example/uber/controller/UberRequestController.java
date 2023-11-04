@@ -42,16 +42,6 @@ public class UberRequestController {
                 });
     }
 
-    @PutMapping("/updateUberRequestPaid/{uberRequestId}")
-    public Optional<UberRequest> updateUberRequestPaid(@PathVariable int uberRequestId, @RequestBody UberRequest updatedUberRequest ) {
-        return uberRequestRepository.findById(uberRequestId)
-                .map(uberRequest -> {
-                    Payment updatedPayment = updatedUberRequest.getPayment();
-                    uberRequest.getPayment().setPaid(updatedPayment.isPaid());
-                    return uberRequestRepository.save(uberRequest);
-                });
-    }
-
 
 
 
