@@ -40,15 +40,14 @@ public class SecurityFilter {
      * - It configures the application to ignore security for requests matching "/api/auth/**".
      * - This allows these specific requests to bypass security checks.
      */
-
+/*
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().requestMatchers(
-                "/api/auth/**","/api/permitAll/**"
+                "/api/auth/**","/api/permitAll/**","/ws"
         );
     }
-
-
+ */
     /**
      * This code configures a SecurityFilterChain as a Spring Bean.
      * - SecurityFilterChain defines the security configuration for HTTP requests.
@@ -78,16 +77,16 @@ public class SecurityFilter {
                     })
                     .csrf(AbstractHttpConfigurer::disable)
                     .authorizeHttpRequests((req) -> req
-                            .requestMatchers("/api/permitAll/**", "/api/auth/**").permitAll()
-                            //.requestMatchers("/api/auth/**").permitAll()
-
+                            .requestMatchers("/api/permitAll/**",
+                                                        "/api/auth/**",
+                                                        "/ws/**")
+                                                        .permitAll()
                             .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                             .requestMatchers("/api/driver/**").hasAuthority("DRIVER")
                             .requestMatchers("/api/user/**", "/api/payment/**").hasAuthority("USER")
                             .anyRequest().authenticated()
                     )
                     .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                    //.authenticationProvider(authenticationProvider())
                     .authenticationManager(authenticationManager())
                     .addFilterBefore(jwtAuthFilter,
                             UsernamePasswordAuthenticationFilter.class)

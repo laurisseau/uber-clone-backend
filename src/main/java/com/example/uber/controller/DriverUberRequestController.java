@@ -8,6 +8,8 @@ import com.example.uber.repository.UberRequestRepository;
 import com.example.uber.service.DriverUberRequestService;
 import com.example.uber.service.UberRequestService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Driver;
@@ -18,7 +20,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/driver")
 public class DriverUberRequestController {
-
+    @Autowired
+    private final SimpMessagingTemplate messagingTemplate;
     private final DriverUberRequestService driverUberRequestService;
     private final UberRequestService uberRequestService;
     private final UberRequestRepository uberRequestRepository;
@@ -38,7 +41,9 @@ public class DriverUberRequestController {
             UberRequest uberRequest = uberRequestOptional.get();
             uberRequest.setAccepted(true);
             uberRequest.setDriver(existingDriver);
-            return Optional.of(uberRequestRepository.save(uberRequest));
+            Optional<UberRequest> update = Optional.of(uberRequestRepository.save(uberRequest));
+            //messagingTemplate.convertAndSend("/driver/acceptUberRequest", update);
+            return update;
         }
 
         return Optional.empty();
