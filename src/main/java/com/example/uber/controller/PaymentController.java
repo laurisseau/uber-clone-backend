@@ -1,13 +1,12 @@
 package com.example.uber.controller;
 
 import com.example.uber.model.Payment;
-import com.example.uber.model.UberRequest;
 import com.example.uber.repository.UberRequestRepository;
 import com.example.uber.service.PaymentService;
 import com.stripe.exception.StripeException;
-import com.stripe.model.PaymentIntent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -18,6 +17,7 @@ import java.util.Optional;
 public class PaymentController {
     private final UberRequestRepository uberRequestRepository;
     private final PaymentService paymentService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @PostMapping("/create-payment-intent")
     public Payment payment(@RequestBody Payment payment) throws StripeException {
@@ -25,19 +25,18 @@ public class PaymentController {
     }
 
     @GetMapping("/paidUberRequest/{uberRequestId}")
-    public ResponseEntity<String> paidUberRequest(@PathVariable int uberRequestId) {
+    public ResponseEntity<Optional<Object>> paidUberRequest(@PathVariable int uberRequestId) {
         try {
-            uberRequestRepository.findById(uberRequestId)
+            Optional<Object> paidUberRequest = uberRequestRepository.findById(uberRequestId)
                     .map(uberRequest -> {
                         uberRequest.getPayment().setPaid(true);
                         return uberRequestRepository.save(uberRequest);
                     });
-
-            return ResponseEntity.ok("User paid ");
+            return ResponseEntity.ok(paidUberRequest);
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body("payment failed: " + e.getMessage());
-
+            //return ResponseEntity.badRequest().body(uberRequest);
+            return null;
         }
 
     }

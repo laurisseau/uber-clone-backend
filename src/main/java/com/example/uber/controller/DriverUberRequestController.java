@@ -9,6 +9,8 @@ import com.example.uber.service.DriverUberRequestService;
 import com.example.uber.service.UberRequestService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,7 +44,7 @@ public class DriverUberRequestController {
             uberRequest.setAccepted(true);
             uberRequest.setDriver(existingDriver);
             Optional<UberRequest> update = Optional.of(uberRequestRepository.save(uberRequest));
-            //messagingTemplate.convertAndSend("/driver/acceptUberRequest", update);
+            messagingTemplate.convertAndSend("/topic/acceptUberRequest", update);
             return update;
         }
 
