@@ -32,6 +32,7 @@ public class PaymentController {
                         uberRequest.getPayment().setPaid(true);
                         return uberRequestRepository.save(uberRequest);
                     });
+            messagingTemplate.convertAndSend("/topic/paidUberRequest", "paid");
             return ResponseEntity.ok(paidUberRequest);
         } catch (Exception e) {
             System.out.println(e.getMessage());
